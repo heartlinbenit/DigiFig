@@ -42,7 +42,7 @@ app.get('/transactions', async (req, res) => {
         userMap[user.cardNumber.replace(/\s+/g, '')] = user.name;
       }
     });
-   
+
     const updatedTransactions = transactions.map(txn => {
       // Try to find the user by different variations of the card number
       const userName = txn.cardNumber 
@@ -51,8 +51,6 @@ app.get('/transactions', async (req, res) => {
            userMap[txn.cardNumber.replace(/\s+/g, '')] || 
            'Unknown User')
         : 'No Card Number';
-        console.log('Users:', users.map(u => ({ name: u.name, card: u.cardNumber })));
-        console.log('Transactions:', transactions.map(t => t.cardNumber));
       return {
         ...txn,
         userName
@@ -64,6 +62,7 @@ app.get('/transactions', async (req, res) => {
     res.status(500).json({ message: 'Error fetching transactions', error: err.message });
   }
 });
+
 app.get('/users', async (req, res) => {
   try {
     const response = await axios.get('http://localhost:5000/get-users');

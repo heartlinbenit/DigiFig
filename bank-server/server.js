@@ -21,13 +21,13 @@ mongoose.connection.once('open', () => {
 
 // Schemas
 const transactionSchema = new mongoose.Schema({
-  accountNumber:String,
+  accountNumber: String,
   cardNumber: String,
   expiry: String,
   amount: Number,
   timestamp: String,
-  status: String
-  
+  status: String,
+  userName: String // Added userName
 });
 
 const Transaction = mongoose.model('Transaction', transactionSchema, 'transactions');
@@ -56,29 +56,36 @@ app.post('/bank-process', async (req, res) => {
     const user = await User.findOne({ cardNumber });
 
     if (!user || user.cvv !== cvv || user.expiry !== expiry) {
-      // In /bank-process route of backend
-await new Transaction({
-  accountNumber: user.accountNumber,  // You can remove this if you don't need accountNumber
-  cardNumber: user.cardNumber,        // Use cardNumber here instead of accountNumber
-  expiry: user.expiry,
-  amount,
-  timestamp,
-  status: 'Success',
-  userName: user.name // Add this line
-}).save();
+      // Save failed transaction even if user details are invalid
+      await new Transaction({
+        cardNumber,      // Save the cardNumber in the transaction
+        expiry,          // Save expiry
+        amount,          // Save the amount
+        timestamp,       // Save timestamp
+        status: 'Failed',
+        userName: 'Unknown User' // Assuming 'Unknown User' if user doesn't match
+      }).save();
 
-      console.log("no")
       return res.status(403).json({ status: 'Failed', message: 'Invalid user or card details' });
     }
 
     if (user.balance < amount) {
-      await new Transaction({ cardNumber, expiry, cvv, amount, timestamp, status: 'Failed' }).save();
+      // Save failed transaction due to insufficient balance
+      await new Transaction({
+        cardNumber,
+        expiry,
+        amount,
+        timestamp,
+        status: 'Failed',
+        userName: user.name // Save user name in failed transaction
+      }).save();
+
       return res.json({ status: 'Failed', message: 'Insufficient balance' });
     }
 
     user.balance -= amount;
     await user.save();
-   
+
     await new Transaction({
       accountNumber: user.accountNumber,
       cardNumber: user.cardNumber,
@@ -86,8 +93,9 @@ await new Transaction({
       amount,
       timestamp,
       status: 'Success',
-      userName: user.name // Add this line
+      userName: user.name // Save user name in successful transaction
     }).save();
+
     res.json({ status: 'Success', message: 'Payment processed successfully' });
   } catch (error) {
     res.status(500).json({ status: 'Failed', error: error.message });
