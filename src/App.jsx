@@ -5,7 +5,7 @@ import SuccessPage from "./components/SuccessPage";
 import AdminLogin from "./components/AdminLogin";
 import AdminDashboard from "./components/AdminDashboard";
 import UserManagement from "./components/UserManagement"; // ✅ Add this import
-
+import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <Router>
@@ -14,7 +14,14 @@ function App() {
         <Route path="/payment" element={<PaymentForm />} />
         <Route path="/success" element={<SuccessPage />} />
         <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/user-management" element={<UserManagement />} /> {/* ✅ Add this */}
       </Routes>
     </Router>

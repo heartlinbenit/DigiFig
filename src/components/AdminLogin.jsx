@@ -1,19 +1,19 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// AdminLogin.js
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function AdminLogin() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (username === "admin" && password === "admin123") {
-      
-      navigate("/admin-dashboard");
-      // Optional: navigate("/admin-dashboard");
+    if (username === 'admin' && password === 'admin123') {
+      sessionStorage.setItem('isAdminLoggedIn', 'true');
+      navigate('/admin-dashboard', { replace: true });
     } else {
-      alert("Invalid credentials");
+      alert('Invalid credentials');
     }
   };
 
