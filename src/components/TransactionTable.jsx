@@ -15,8 +15,10 @@ function TransactionTable({ transactions }) {
           </tr>
         </thead>
         <tbody>
+         
           {transactions && transactions.length > 0 ? (
             transactions.map((txn, index) => (
+             
               <tr key={index}>
                 <td>{txn.userName || "No user found"}</td>
                 <td className={txn.status === "Success" ? "approved" : "failed"}>

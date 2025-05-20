@@ -1,92 +1,112 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/PaymentForm.css";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import OTPModal from './OTPModal';
+import '../styles/PaymentForm.css'; // Assuming styles are in PaymentForm.css
 
 function PaymentForm() {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    cardNumber: "",
-    expiry: "",
-    cvv: "",
-    amount: "",
-  });
+    const [cardNumber, setCardNumber] = useState('');
+    const [expiry, setExpiry] = useState('');
+    const [cvv, setCvv] = useState('');
+    const [amount, setAmount] = useState('');
+    const [phone, setPhone] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("Form data being sent:", formData); // 🔍 Debug log
-  
-    try {
-      const response = await fetch("http://localhost:6001/process-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-  
-      const result = await response.json();
-  
-      if (result.status === "Success") {
-        navigate("/success", {
-          state: { status: result.status, message: result.message || "Payment processed successfully!" },
-        });
-      } else {
-        throw new Error(result.message || "Unexpected response from server");
-      }
-    } catch (error) {
-      console.error("Payment failed:", error.message);
-      navigate("/success", {
-        state: { status: "Failed", message: error.message || "An error occurred during payment." },
-      });
-    }
-  };
-  
+    useEffect(() => {
+        const fetchPhone = async () => {
+            try {
+                const res = await axios.get('http://localhost:5000/user-phone');
+                setPhone(res.data.phone);
+            } catch (err) {
+                console.error('Failed to fetch phone number', err);
+            }
+        };
 
-  
-  return (
-    <div className="form-container">
-      <h1>Make your Payment</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="cardNumber"
-          placeholder="Card Number"
-          maxLength="16"
-          required
-          value={formData.cardNumber}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="expiry"
-          placeholder="MM/YY"
-          maxLength="5"
-          required
-          value={formData.expiry}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="cvv"
-          placeholder="CVV"
-          maxLength="3"
-          required
-          value={formData.cvv}
-          onChange={handleChange}
-        />
-        <input
-          type="number"
-          name="amount"
-          placeholder="Amount"
-          required
-          value={formData.amount}
-          onChange={handleChange}
-        />
-        <button type="submit">Pay Now</button>
-      </form>
-    </div>
-  );
+        fetchPhone();
+    }, []);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+        try {
+            await axios.post('http://localhost:5000/send-otp', {
+                cardNumber,
+                expiry,
+                cvv,
+                amount: parseFloat(amount),
+                phone 
+            });
+            setShowModal(true);
+        } catch (err) {
+            const errMsg = err.response?.data?.error || 'Error sending OTP';
+            setError(errMsg);
+        }
+    };
+
+    const handleOtpClose = () => {
+        setShowModal(false);
+    };
+
+    const handlePaymentSuccess = () => {
+        setShowModal(false);
+        setSuccess('Payment processed successfully!');
+        setCardNumber('');
+        setExpiry('');
+        setCvv('');
+        setAmount('');
+    };
+
+    return (
+        <div className="form-container">
+            <h1>Payment Form</h1>
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(e.target.value)}
+                    placeholder="Card Number"
+                    required
+                />
+                <input
+                    type="text"
+                    value={expiry}
+                    onChange={(e) => setExpiry(e.target.value)}
+                    placeholder="Expiry (MM/YY)"
+                    required
+                />
+                <input
+                    type="password"
+                    value={cvv}
+                    onChange={(e) => setCvv(e.target.value)}
+                    placeholder="CVV"
+                    required
+                />
+                <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Amount"
+                    required
+                />
+                <button type="submit">Pay</button>
+            </form>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {success && <p style={{ color: 'green' }}>{success}</p>}
+            {showModal && (
+                <OTPModal
+                    phone={phone}
+                    cardNumber={cardNumber}
+                    expiry={expiry}
+                    cvv={cvv}
+                    amount={parseFloat(amount)}
+                    onSuccess={handlePaymentSuccess}
+                    onClose={handleOtpClose}
+                />
+            )}
+        </div>
+    );
 }
 
 export default PaymentForm;
