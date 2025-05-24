@@ -89,6 +89,22 @@ await axios.post('http://localhost:5000/send_otp', {
 
     return (
         <div className="form-container">
+            <button
+    onClick={() => navigate('/')}
+    style={{
+        position: 'absolute',
+        top: '20px',
+        left: '20px',
+        background: '#8B4513',
+        border: 'none',
+        padding: '8px 12px',
+        borderRadius: '5px',
+        cursor: 'pointer'
+    }}
+>
+    ← 
+</button>
+
             <h1>Payment Form</h1>
             <form onSubmit={handleSubmit}>
                 <input
