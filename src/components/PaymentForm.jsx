@@ -14,6 +14,18 @@ function PaymentForm() {
     const [showModal, setShowModal] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    useEffect(() => {
+  const handlePopState = () => {
+    window.history.pushState(null, document.title, window.location.href);
+  };
+
+  window.history.pushState(null, document.title, window.location.href);
+  window.addEventListener('popstate', handlePopState);
+
+  return () => {
+    window.removeEventListener('popstate', handlePopState);
+  };
+}, []);
 
     useEffect(() => {
         const fetchPhone = async () => {
