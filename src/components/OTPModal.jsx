@@ -1,61 +1,49 @@
 import React, { useState } from 'react';
 import axios from 'axios';
- // Optional: for styling the modal
 
-function OTPModal({ phone, cardNumber, expiry, cvv, amount, onClose, onSuccess }) {
+function OTPModal({ phone, cardNumber, expiry, cvv, amount, onClose, onSuccess, onFailure }) {
   const [otp, setOtp] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleVerify = async () => {
-    setError('');
     setLoading(true);
-
+    setError(null);
     try {
-      const response = await axios.post('http://localhost:5000/verify-otp', {
+      const res = await axios.post('http://localhost:4000/verify_otp', {
         phone,
         otp,
         cardNumber,
         expiry,
         cvv,
-        amount: parseFloat(amount)
+        amount,
       });
-
-      if (response.data.message === 'Payment successful') {
-        onSuccess();  // Notify parent of success
-      } else {
-       onFailure(); // callback from parent
-
-      }
+      onSuccess(res.data);
+      onClose();
     } catch (err) {
-      const errMsg = err.response?.data?.error || 'OTP verification failed';
-      setError(errMsg);
+      setError(err.response?.data?.error || 'Verification failed');
+      onFailure && onFailure();
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="otp-modal-overlay">
-      <div className="otp-modal">
-        <h2>Enter OTP</h2>
-        <p>An OTP has been sent to your phone number {phone}</p>
-        <input
-          type="text"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          maxLength={6}
-          placeholder="Enter 6-digit OTP"
-          autoFocus
-        />
-        {error && <p className="error">{error}</p>}
-        <div className="buttons">
-          <button onClick={onClose} disabled={loading}>Cancel</button>
-          <button onClick={handleVerify} disabled={loading || otp.length !== 6}>
-            {loading ? 'Verifying...' : 'Verify OTP'}
-          </button>
-        </div>
-      </div>
+    <div className="modal">
+      <h3>Enter OTP sent to {phone}</h3>
+      <input
+        type="text"
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
+        placeholder="Enter OTP"
+      />
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <button onClick={handleVerify} disabled={loading || otp.length !== 6}>
+        {loading ? 'Verifying...' : 'Verify OTP'}
+      </button>
+      <button onClick={onClose} disabled={loading}>
+        Cancel
+      </button>
     </div>
   );
 }

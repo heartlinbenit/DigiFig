@@ -119,6 +119,24 @@ app.get('/get-transactions', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch transactions' });
     }
 });
+app.post('/get-phone', async (req, res) => {
+    try {
+        const { cardNumber, expiry, cvv } = req.body;
+        if (!cardNumber || !expiry || !cvv) {
+            return res.status(400).json({ error: 'Missing card details' });
+        }
+
+        const user = await usersCollection.findOne({ cardNumber, expiry, cvv });
+        if (!user || !user.phone) {
+            return res.status(404).json({ error: 'User or phone not found' });
+        }
+
+        res.json({ phone: user.phone });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 // ✅ /user-phone: Dummy route to get phone of first user
 app.get('/user-phone', async (req, res) => {

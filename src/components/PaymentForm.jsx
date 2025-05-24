@@ -10,10 +10,11 @@ function PaymentForm() {
     const [expiry, setExpiry] = useState('');
     const [cvv, setCvv] = useState('');
     const [amount, setAmount] = useState('');
-    const [phone, setPhone] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [phoneFetched, setPhoneFetched] = useState('');
+
     useEffect(() => {
   const handlePopState = () => {
     window.history.pushState(null, document.title, window.location.href);
@@ -27,31 +28,28 @@ function PaymentForm() {
   };
 }, []);
 
-    useEffect(() => {
-        const fetchPhone = async () => {
-            try {
-                const res = await axios.get('http://localhost:5000/user-phone');
-                setPhone(res.data.phone);
-            } catch (err) {
-                console.error('Failed to fetch phone number', err);
-            }
-        };
-
-        fetchPhone();
-    }, []);
-
+   
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setSuccess('');
         try {
-            await axios.post('http://localhost:4000/send_otp', {
-                cardNumber,
-                expiry,
-                cvv,
-                amount: parseFloat(amount),
-                phone
-            });
+           const phoneRes = await axios.post('http://localhost:5000/get-phone', {
+    cardNumber,
+    expiry,
+    cvv
+});
+
+const phone = phoneRes.data.phone;
+ setPhoneFetched(phone);
+await axios.post('http://localhost:5000/send_otp', {
+    cardNumber,
+    expiry,
+    cvv,
+    amount: parseFloat(amount),
+    phone
+});
+
             setShowModal(true);
         } catch (err) {
             const errMsg = err.response?.data?.error || 'Error sending OTP';
@@ -171,16 +169,17 @@ function PaymentForm() {
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {success && <p style={{ color: 'green' }}>{success}</p>}
             {showModal && (
-                <OTPModal
-                    phone={phone}
-                    cardNumber={cardNumber}
-                    expiry={expiry}
-                    cvv={cvv}
-                    amount={parseFloat(amount)}
-                    onSuccess={handlePaymentSuccess}
-                    onFailure={handlePaymentFailure}
-                    onClose={handleOtpClose}
-                />
+               <OTPModal
+    phone={phoneFetched}
+    cardNumber={cardNumber}
+    expiry={expiry}
+    cvv={cvv}
+    amount={parseFloat(amount)}
+    onSuccess={handlePaymentSuccess}
+    onFailure={handlePaymentFailure}
+    onClose={handleOtpClose}
+/>
+
             )}
         </div>
     );
