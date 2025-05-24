@@ -1,24 +1,19 @@
 .summary-cards {
   display: flex;
-  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 1.5rem;
-  margin: 20px 0;
-  padding: 0 1rem;
+  gap: 1rem;
+  justify-content: space-evenly;
 }
 
-/* Individual card styling */
 .card {
-  background-color: #f8f8f8;
-  padding: 20px 25px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  flex: 1 1 220px;
-  max-width: 260px;
-  text-align: center;
-  color: #5C4033;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem;
+  font-size: 0.9rem;
+  width: 200px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 
 .card:hover {
   transform: translateY(-5px);

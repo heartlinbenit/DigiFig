@@ -5,19 +5,20 @@ import TransactionTable from './TransactionTable';
 import '../styles/AdminDashboard.css';
 import axios from 'axios';
 import ProtectedRoute from './ProtectedRoute';
+import DashboardDetails from './DashboardDetails';
 
 function AdminDashboard() {
   const [transactions, setTransactions] = useState([]);
+  const [showDashboardContent, setShowDashboardContent] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const isAdmin = sessionStorage.getItem('isAdminLoggedIn');
-  if (isAdmin !== 'true') {
-    navigate('/admin-login', { replace: true });
-  } else {
-    // Force reload page on first load to avoid stale cache
-    window.history.replaceState(null, '', window.location.pathname);
-  }
+    if (isAdmin !== 'true') {
+      navigate('/admin-login', { replace: true });
+    } else {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
 
     const fetchData = async () => {
       try {
@@ -32,30 +33,41 @@ function AdminDashboard() {
   }, [navigate]);
 
   const handleLogout = () => {
-   sessionStorage.clear();
+    sessionStorage.clear();
     navigate('/admin-login', { replace: true });
+  };
+
+  const handleShowDashboard = () => {
+    setShowDashboardContent(true);
   };
 
   return (
     <div className="admin-dashboard">
+     
       <header className="dashboard-header">
         <h1>Admin Dashboard</h1>
         <button className="nav-button logout-button" onClick={handleLogout}>
           Logout
         </button>
       </header>
-
+       <DashboardDetails />
       <div className="dashboard-actions">
         <button className="nav-button" onClick={() => navigate('/user-management')}>
           User Management
         </button>
+        <button className="nav-button" onClick={handleShowDashboard}>
+          Show Dashboard
+        </button>
       </div>
+      
 
-
-           <SummaryCards transactions={transactions} />
-           <TransactionTable transactions={transactions} />
-     
-      </div>
+      {showDashboardContent && (
+        <>
+          <SummaryCards transactions={transactions} />
+          <TransactionTable transactions={transactions} />
+        </>
+      )}
+    </div>
   );
 }
 

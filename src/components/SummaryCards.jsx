@@ -1,4 +1,4 @@
-
+import React from "react";
 function SummaryCards({ transactions, theme = "light" }) {
   const total = transactions.length;
   const totalAmount = transactions.reduce((acc, txn) => acc + Number(txn.amount), 0);
@@ -42,14 +42,18 @@ function SummaryCards({ transactions, theme = "light" }) {
   const themeColors = colors[theme] || colors.light;
 
   return (
-    <div className="summary-cards" style={{ padding: "0 1rem" }}>
+    <div className="summary-cards">
       <div
-        className="card"
-        style={{
-          backgroundColor: themeColors.cardBg,
-          color: themeColors.cardText,
-        }}
-      >
+  className="card"
+  style={{
+    backgroundColor: themeColors.cardBg,
+    color: themeColors.cardText,
+    padding: "0.5rem 1rem",
+    margin: "0.5rem",
+    fontSize: "0.9rem",
+    width: "200px"
+  }}
+>
         <h3>Total Transactions</h3>
         <p>{total} Transactions</p>
       </div>
@@ -57,8 +61,12 @@ function SummaryCards({ transactions, theme = "light" }) {
       <div
         className="card"
         style={{
-          backgroundColor: themeColors.cardBg,
-          color: themeColors.cardText,
+           backgroundColor: themeColors.cardBg,
+    color: themeColors.cardText,
+    padding: "0.5rem 1rem",
+    margin: "0.5rem",
+    fontSize: "0.9rem",
+    width: "200px"
         }}
       >
         <h3>Total Amount Processed</h3>
@@ -68,9 +76,12 @@ function SummaryCards({ transactions, theme = "light" }) {
       <div
         className="card success"
         style={{
-          backgroundColor: themeColors.successBg,
-          borderLeft: `6px solid ${themeColors.successBorder}`,
-          color: themeColors.successText,
+          backgroundColor: themeColors.cardBg,
+    color: themeColors.cardText,
+    padding: "0.5rem 1rem",
+    margin: "0.5rem",
+    fontSize: "0.9rem",
+    width: "200px"
         }}
       >
         <h3>Successful Transactions</h3>
@@ -82,9 +93,12 @@ function SummaryCards({ transactions, theme = "light" }) {
       <div
         className="card fail"
         style={{
-          backgroundColor: themeColors.failBg,
-          borderLeft: `6px solid ${themeColors.failBorder}`,
-          color: themeColors.failText,
+          backgroundColor: themeColors.cardBg,
+    color: themeColors.cardText,
+    padding: "0.5rem 1rem",
+    margin: "0.5rem",
+    fontSize: "0.9rem",
+    width: "200px"
         }}
       >
         <h3>Failed Transactions</h3>
