@@ -1,9 +1,12 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const app = express();
+const cors = require('cors');
 require('dotenv').config();
 
 app.use(express.json());
+
+app.use(cors()); // <-- This allows all origins. For production, configure it securely.
 
 // MongoDB connection
 const MONGO_URI = process.env.MONGO_URI || 'your-mongo-uri-here';
@@ -22,7 +25,7 @@ initDb().catch(console.error);
 // 1) GET /users — list everyone
 app.get('/users', async (req, res) => {
   try {
-    const users = await usersCollection.find({}, { projection: { _id: 0, name: 1, accountNumber: 1, balance: 1 } }).toArray();
+    const users = await usersCollection.find({}, { projection: { _id: 0, name: 1, accountNumber: 1, balance: 1, phone: 1 } }).toArray();
     res.json(users);
   } catch (err) {
     console.error('Error fetching users:', err);
@@ -32,18 +35,19 @@ app.get('/users', async (req, res) => {
 
 // 2) POST /add-user — create a new user
 app.post('/add-user', async (req, res) => {
-  const { name, accountNumber, cardNumber, expiry, cvv, balance } = req.body;
-  if (!name || !accountNumber || !cardNumber || !expiry || !cvv || balance == null) {
+  const { name, accountNumber, cardNumber, expiry, cvv, balance, phone } = req.body;
+  if (!name || !accountNumber || !cardNumber || !expiry || !cvv || balance == null || !phone) {
     return res.status(400).json({ error: 'All fields are required' });
   }
   try {
-    await usersCollection.insertOne({ name, accountNumber, cardNumber, expiry, cvv, balance, phone: '' });
+    await usersCollection.insertOne({ name, accountNumber, cardNumber, expiry, cvv, balance, phone });
     res.json({ message: 'User added' });
   } catch (err) {
     console.error('Error adding user:', err);
     res.status(500).json({ error: 'Could not add user' });
   }
 });
+
 // POST /transaction - verify or process transaction
 app.post('/transaction', async (req, res) => {
     try {

@@ -24,7 +24,8 @@ function OTPModal({ phone, cardNumber, expiry, cvv, amount, onClose, onSuccess }
       if (response.data.message === 'Payment successful') {
         onSuccess();  // Notify parent of success
       } else {
-        setError('Verification failed');
+       onFailure(); // callback from parent
+
       }
     } catch (err) {
       const errMsg = err.response?.data?.error || 'OTP verification failed';

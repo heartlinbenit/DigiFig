@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SummaryCards from './SummaryCards';
 import TransactionTable from './TransactionTable';
 import '../styles/AdminDashboard.css';
 import axios from 'axios';
+import ProtectedRoute from './ProtectedRoute';
 
 function AdminDashboard() {
   const [transactions, setTransactions] = useState([]);
@@ -12,10 +12,12 @@ function AdminDashboard() {
 
   useEffect(() => {
     const isAdmin = sessionStorage.getItem('isAdminLoggedIn');
-    if (isAdmin !== 'true') {
-      navigate('/admin-login', { replace: true });
-      return;
-    }
+  if (isAdmin !== 'true') {
+    navigate('/admin-login', { replace: true });
+  } else {
+    // Force reload page on first load to avoid stale cache
+    window.history.replaceState(null, '', window.location.pathname);
+  }
 
     const fetchData = async () => {
       try {
@@ -29,9 +31,19 @@ function AdminDashboard() {
     fetchData();
   }, [navigate]);
 
+  const handleLogout = () => {
+   sessionStorage.clear();
+    navigate('/admin-login', { replace: true });
+  };
+
   return (
     <div className="admin-dashboard">
-      <h1>Admin Dashboard</h1>
+      <header className="dashboard-header">
+        <h1>Admin Dashboard</h1>
+        <button className="nav-button logout-button" onClick={handleLogout}>
+          Logout
+        </button>
+      </header>
 
       <div className="dashboard-actions">
         <button className="nav-button" onClick={() => navigate('/user-management')}>
@@ -39,9 +51,11 @@ function AdminDashboard() {
         </button>
       </div>
 
-      <SummaryCards transactions={transactions} />
-      <TransactionTable transactions={transactions} />
-    </div>
+
+           <SummaryCards transactions={transactions} />
+           <TransactionTable transactions={transactions} />
+     
+      </div>
   );
 }
 

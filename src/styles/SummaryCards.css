@@ -1,0 +1,77 @@
+.summary-cards {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin: 20px 0;
+  padding: 0 1rem;
+}
+
+/* Individual card styling */
+.card {
+  background-color: #f8f8f8;
+  padding: 20px 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  flex: 1 1 220px;
+  max-width: 260px;
+  text-align: center;
+  color: #5C4033;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Headings inside cards */
+.card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* Main content text inside cards */
+.card p {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Success card with green left border */
+.card.success {
+  background-color: #d4edda;
+  border-left: 6px solid #28a745;
+  color: #155724;
+}
+
+/* Fail card with red left border */
+.card.fail {
+  background-color: #f8d7da;
+  border-left: 6px solid #dc3545;
+  color: #721c24;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .summary-cards {
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .card {
+    max-width: 100%;
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  .card p {
+    font-size: 1.3rem;
+  }
+}

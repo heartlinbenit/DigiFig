@@ -22,7 +22,15 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/user-management" element={<UserManagement />} /> {/* ✅ Add this */}
+        <Route
+          path="/user-management"
+          element={
+            <ProtectedRoute>
+              <UserManagement />
+            </ProtectedRoute>
+          }
+        />
+
       </Routes>
     </Router>
   );

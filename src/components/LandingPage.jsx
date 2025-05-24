@@ -3,7 +3,7 @@ import "../styles/LandingPage.css";
 
 function LandingPage() {
   const navigate = useNavigate();
-
+ 
   return (
     <div className="landing-container">
       <button className="bank-button" onClick={() => navigate("/admin-login")}>

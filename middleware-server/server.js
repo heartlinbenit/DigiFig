@@ -30,7 +30,7 @@ initDb().catch(console.error);
 // ✅ /send-otp: Verify card and send OTP
 // ✅ /send-otp: Verify card and send OTP
 
-app.post('/send-otp', async (req, res) => {
+app.post('/send_otp', async (req, res) => {
     try {
         const { cardNumber, expiry, cvv, amount, phone } = req.body;
         if (!cardNumber || !expiry || !cvv || !amount || !phone) {
